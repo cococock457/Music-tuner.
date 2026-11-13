@@ -16,6 +16,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -66,10 +67,21 @@ class MainActivity : ComponentActivity() {
 data class Instrument(val label: String, val shift: Int)
 
 val instruments = listOf(
-    Instrument("Сопр B♭", 2),
-    Instrument("Альт E♭", 9),
-    Instrument("Тенор B♭", 14),
-    Instrument("Бари E♭", 21)
+    Instrument("C (концертный)", 0),
+    Instrument("Альт сакс E♭", 9),
+    Instrument("Тенор сакс B♭", 14),
+    Instrument("Сопр. сакс B♭", 2),
+    Instrument("Бари сакс E♭", 21),
+    Instrument("Кларнет B♭", 2),
+    Instrument("Бас-кларнет B♭", 14),
+    Instrument("Труба B♭", 2),
+    Instrument("Валторна F", 7),
+    Instrument("Англ. рожок F", 7),
+    Instrument("Флейта C", 0),
+    Instrument("Гобой C", 0),
+    Instrument("Фагот C", 0),
+    Instrument("Тромбон C", 0),
+    Instrument("Блокфлейта C", -12)
 )
 
 private val NAMES = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
@@ -97,6 +109,25 @@ fun RowScope.Chip(text: String, selected: Boolean, onClick: () -> Unit) {
             .border(1.dp, if (selected) bg else MaterialTheme.colorScheme.outline, shape)
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp)
+    )
+}
+
+@Composable
+fun InstrumentChip(text: String, selected: Boolean, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(12.dp)
+    val bg = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+    val fg = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+    Text(
+        text = text,
+        color = fg,
+        fontSize = 13.sp,
+        fontWeight = if (selected) FontWeight.Medium else FontWeight.Normal,
+        modifier = Modifier
+            .clip(shape)
+            .background(bg)
+            .border(1.dp, if (selected) bg else MaterialTheme.colorScheme.outline, shape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 8.dp)
     )
 }
 
@@ -168,8 +199,13 @@ fun TunerApp() {
             Text("Тюнер", fontSize = 22.sp, fontWeight = FontWeight.Medium, color = cs.onBackground)
             Spacer(Modifier.height(12.dp))
 
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                instruments.forEach { ins -> Chip(ins.label, ins == instrument) { instrument = ins } }
+            Row(
+                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                instruments.forEach { ins ->
+                    InstrumentChip(ins.label, ins == instrument) { instrument = ins }
+                }
             }
             Spacer(Modifier.height(12.dp))
 
